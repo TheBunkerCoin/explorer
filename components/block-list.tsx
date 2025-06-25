@@ -133,7 +133,7 @@ export default function BlockList() {
           ))
         ) : (
           <>
-            {displayBlocks.map((block, index) => (
+            {displayBlocks.map((block) => (
               <div
                 key={block.hash}
                 onClick={() => handleBlockClick(block.hash)}
