@@ -16,7 +16,7 @@ function truncateHash(hash: string) {
 function StatusIndicator({ status, type }: { status: string; type: 'block' | 'skip' }) {
   if (type === 'skip') {
     return (
-      <div className="flex items-center gap-1.5">
+      <div className="flex flex-row sm:flex-row items-center gap-1.5">
         <AlertTriangle size={14} className="text-red-400" />
         <span className="text-xs px-1.5 py-0.5 rounded bg-red-400/20 text-red-400 font-medium w-[70px] text-center">
           skipped
@@ -27,7 +27,7 @@ function StatusIndicator({ status, type }: { status: string; type: 'block' | 'sk
 
   if (status === 'finalized') {
     return (
-      <div className="flex items-center gap-1.5">
+      <div className="flex flex-row sm:flex-row items-center gap-1.5">
         <Check size={14} className="text-white" />
         <span className="text-xs px-1.5 py-0.5 rounded bg-white/20 text-white font-medium w-[70px] text-center">
           {status}
@@ -37,7 +37,7 @@ function StatusIndicator({ status, type }: { status: string; type: 'block' | 'sk
   }
 
   return (
-    <div className="flex items-center gap-1.5">
+    <div className="flex flex-row sm:flex-row items-center gap-1.5">
       <Loader2 size={14} className="text-white animate-spin" />
       <span className="text-xs px-1.5 py-0.5 rounded bg-white/20 text-white font-medium w-[70px] text-center">
         {status}
@@ -145,7 +145,7 @@ export default function BlockList() {
                   animation: index === 0 && displayBlocks.length > 1 && block.type !== 'skip' ? 'slideDown 0.3s ease-out' : undefined
                 }}
               >
-                <div className="flex flex-col gap-0.5">
+                <div className="flex flex-col gap-0.5 flex-1">
                   <div className="flex items-center gap-2.5">
                     <span className="font-mono font-bold text-base">#{block.slot}</span>
                     {index === 0 && displayBlocks.length > 0 && block.type !== 'skip' && (
@@ -154,16 +154,18 @@ export default function BlockList() {
                       </Badge>
                     )}
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-xs text-muted-foreground">
                     <span className="font-mono">{truncateHash(block.hash)}</span>
-                    {block.producer !== undefined && (
-                      <>
-                        <span className="opacity-60">•</span>
-                        <span>Node {block.producer}</span>
-                      </>
-                    )}
-                    <span className="opacity-60">•</span>
-                    <span>{formatDistanceToNow(block.timestamp, { addSuffix: true })}</span>
+                    <div className="flex items-center gap-2">
+                      {block.producer !== undefined && (
+                        <>
+                          <span className="hidden sm:inline opacity-60">•</span>
+                          <span>Node {block.producer}</span>
+                          <span className="opacity-60">•</span>
+                        </>
+                      )}
+                      <span>{formatDistanceToNow(block.timestamp, { addSuffix: true })}</span>
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">

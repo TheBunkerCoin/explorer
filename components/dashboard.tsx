@@ -149,7 +149,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <div className="w-full flex flex-col items-center px-4 py-8">
+      <div className="w-full flex flex-col items-center px-4 sm:px-0 py-8">
         <div className="w-full max-w-3xl">
           <NodeStatus />
           <BlockList />
