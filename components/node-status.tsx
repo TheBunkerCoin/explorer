@@ -47,7 +47,7 @@ export default function NodeStatus() {
                   </span>
                   <span className="text-xs font-medium text-muted-foreground">Node {node.node_id}</span>
                 </div>
-                <div className="text-lg font-mono font-bold text-foreground">{node.finalized_slot}</div>
+                <div className="text-sm sm:text-base md:text-lg font-mono font-bold text-foreground">{node.finalized_slot}</div>
                 <div className="text-[11px] text-muted-foreground mt-0.5 opacity-80">Finalized</div>
               </div>
             ))}

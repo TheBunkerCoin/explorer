@@ -25,6 +25,8 @@ export const displayCountAtom = atom(50);
 
 export const lowestFetchedSlotAtom = atom<number | null>(null);
 
+export const highestFinalizedSlotAtom = atom<number | null>(null);
+
 export const wsConnectedAtom = atom(false);
 
 export const nonFinalizedSlotsAtom = atom<Set<number>>(new Set<number>()); 

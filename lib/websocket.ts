@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useSetAtom, useAtom } from 'jotai';
-import { blocksAtom, wsConnectedAtom, nonFinalizedSlotsAtom } from './atoms';
+import { blocksAtom, wsConnectedAtom, nonFinalizedSlotsAtom, latestProducerAtom, highestFinalizedSlotAtom } from './atoms';
 import { Block } from './types';
 
 const WS_URL = 'ws://localhost:3001/ws';
@@ -9,17 +9,45 @@ export function useWebSocket() {
   const [blocks, setBlocks] = useAtom(blocksAtom);
   const setWsConnected = useSetAtom(wsConnectedAtom);
   const setNonFinalizedSlots = useSetAtom(nonFinalizedSlotsAtom);
+  const setLatestProducer = useSetAtom(latestProducerAtom);
+  const setHighestFinalizedSlot = useSetAtom(highestFinalizedSlotAtom);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const updateBlockStatus = useCallback((updatedBlock: Block) => {
     setBlocks(prevBlocks => {
-      return prevBlocks.map(block => {
+      const newBlocks = prevBlocks.map(block => {
         if (block.slot === updatedBlock.slot) {
           return updatedBlock;
         }
         return block;
       });
+
+      // Check if this update creates a new highest finalized block
+      if (updatedBlock.status === 'finalized' && 
+          updatedBlock.type === 'block' && 
+          updatedBlock.producer !== undefined) {
+        
+        // Find the highest finalized block
+        const highestFinalized = newBlocks.find(block => 
+          block.status === 'finalized' && 
+          block.type === 'block' && 
+          block.producer !== undefined
+        );
+        
+        if (highestFinalized && highestFinalized.slot === updatedBlock.slot) {
+          setHighestFinalizedSlot(prevHighest => {
+            if (prevHighest === null || updatedBlock.slot > prevHighest) {
+              // New highest finalized block - highlight the producer
+              setLatestProducer(updatedBlock.producer!);
+              return updatedBlock.slot;
+            }
+            return prevHighest;
+          });
+        }
+      }
+
+      return newBlocks;
     });
 
     if (updatedBlock.status === 'finalized' || updatedBlock.type === 'skip') {
@@ -29,7 +57,7 @@ export function useWebSocket() {
         return newSet;
       });
     }
-  }, [setBlocks, setNonFinalizedSlots]);
+  }, [setBlocks, setNonFinalizedSlots, setHighestFinalizedSlot, setLatestProducer]);
 
   const connect = useCallback(() => {
     try {

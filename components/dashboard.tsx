@@ -13,7 +13,8 @@ import {
   initialLoadCompleteAtom,
   latestProducerAtom,
   lowestFetchedSlotAtom,
-  nonFinalizedSlotsAtom
+  nonFinalizedSlotsAtom,
+  highestFinalizedSlotAtom
 } from '@/lib/atoms';
 import { api } from '@/lib/api';
 import { useWebSocket } from '@/lib/websocket';
@@ -33,6 +34,7 @@ export default function Dashboard() {
   const setLatestProducer = useSetAtom(latestProducerAtom);
   const setLowestFetchedSlot = useSetAtom(lowestFetchedSlotAtom);
   const [nonFinalizedSlots] = useAtom(nonFinalizedSlotsAtom);
+  const setHighestFinalizedSlot = useSetAtom(highestFinalizedSlotAtom);
   
   const isFirstLoad = useRef(true);
   const totalBlocksCount = useRef(0);
@@ -56,6 +58,18 @@ export default function Dashboard() {
           totalBlocksCount.current = newBlocks.length;
           if (newBlocks.length > 0) {
             setLowestFetchedSlot(newBlocks[newBlocks.length - 1].slot);
+            
+            // Find highest finalized block on initial load
+            const highestFinalized = newBlocks.find(block => 
+              block.status === 'finalized' && 
+              block.type === 'block' && 
+              block.producer !== undefined
+            );
+            
+            if (highestFinalized) {
+              setHighestFinalizedSlot(highestFinalized.slot);
+              setLatestProducer(highestFinalized.producer!);
+            }
           }
           isFirstLoad.current = false;
         } else {
@@ -67,19 +81,33 @@ export default function Dashboard() {
               
               if (!existingBlock) {
                 blockMap.set(newBlock.slot, newBlock);
-                
-                if (newBlock.slot > (prev[0]?.slot || 0) && 
-                    newBlock.type === 'block' && 
-                    newBlock.producer !== undefined) {
-                  setLatestProducer(newBlock.producer);
-                }
               } else if (existingBlock.status !== newBlock.status || 
                          existingBlock.type !== newBlock.type) {
                 blockMap.set(newBlock.slot, newBlock);
               }
             });
             
-            return Array.from(blockMap.values()).sort((a, b) => b.slot - a.slot);
+            const allBlocks = Array.from(blockMap.values()).sort((a, b) => b.slot - a.slot);
+            
+            // Find the highest finalized block
+            const highestFinalized = allBlocks.find(block => 
+              block.status === 'finalized' && 
+              block.type === 'block' && 
+              block.producer !== undefined
+            );
+            
+            if (highestFinalized) {
+              setHighestFinalizedSlot(prevHighest => {
+                if (prevHighest === null || highestFinalized.slot > prevHighest) {
+                  // New highest finalized block - highlight the producer
+                  setLatestProducer(highestFinalized.producer!);
+                  return highestFinalized.slot;
+                }
+                return prevHighest;
+              });
+            }
+            
+            return allBlocks;
           });
         }
       } else if (append) {

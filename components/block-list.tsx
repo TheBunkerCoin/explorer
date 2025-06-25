@@ -1,7 +1,7 @@
 'use client';
 
 import { useAtom, useSetAtom } from 'jotai';
-import { blocksAtom, blocksLoadingAtom, selectedBlockHashAtom, hasMoreBlocksAtom, isLoadingMoreAtom, initialLoadCompleteAtom, showSkippedSlotsAtom, displayCountAtom } from '@/lib/atoms';
+import { blocksAtom, blocksLoadingAtom, selectedBlockHashAtom, hasMoreBlocksAtom, isLoadingMoreAtom, initialLoadCompleteAtom, showSkippedSlotsAtom, displayCountAtom, highestFinalizedSlotAtom } from '@/lib/atoms';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
@@ -54,6 +54,7 @@ export default function BlockList() {
   const [initialLoadComplete] = useAtom(initialLoadCompleteAtom);
   const [showSkippedSlots, setShowSkippedSlots] = useAtom(showSkippedSlotsAtom);
   const [displayCount, setDisplayCount] = useAtom(displayCountAtom);
+  const [highestFinalizedSlot] = useAtom(highestFinalizedSlotAtom);
   const setSelectedBlockHash = useSetAtom(selectedBlockHashAtom);
   
   const observerTarget = useRef<HTMLDivElement>(null);
@@ -142,13 +143,13 @@ export default function BlockList() {
                     : 'bg-card/50'
                 }`}
                 style={{
-                  animation: index === 0 && displayBlocks.length > 1 && block.type !== 'skip' ? 'slideDown 0.3s ease-out' : undefined
+                  animation: block.slot === highestFinalizedSlot && displayBlocks.length > 1 && block.type !== 'skip' ? 'slideDown 0.3s ease-out' : undefined
                 }}
               >
                 <div className="flex flex-col gap-0.5 flex-1">
                   <div className="flex items-center gap-2.5">
                     <span className="font-mono font-bold text-base">#{block.slot}</span>
-                    {index === 0 && displayBlocks.length > 0 && block.type !== 'skip' && (
+                    {block.slot === highestFinalizedSlot && block.type !== 'skip' && (
                       <Badge variant="emerald" className="px-2 py-0 text-[11px] font-semibold">
                         LATEST
                       </Badge>
