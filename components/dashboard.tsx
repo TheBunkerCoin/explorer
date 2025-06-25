@@ -26,12 +26,12 @@ export default function Dashboard() {
   const setNodes = useSetAtom(nodesAtom);
   const setBlocksLoading = useSetAtom(blocksLoadingAtom);
   const setNodesLoading = useSetAtom(nodesLoadingAtom);
-  const [currentOffset, setCurrentOffset] = useAtom(currentOffsetAtom);
+  const setCurrentOffset = useSetAtom(currentOffsetAtom);
   const setHasMoreBlocks = useSetAtom(hasMoreBlocksAtom);
   const setIsLoadingMore = useSetAtom(isLoadingMoreAtom);
   const setInitialLoadComplete = useSetAtom(initialLoadCompleteAtom);
   const setLatestProducer = useSetAtom(latestProducerAtom);
-  const [lowestFetchedSlot, setLowestFetchedSlot] = useAtom(lowestFetchedSlotAtom);
+  const setLowestFetchedSlot = useSetAtom(lowestFetchedSlotAtom);
   const [nonFinalizedSlots] = useAtom(nonFinalizedSlotsAtom);
   
   const isFirstLoad = useRef(true);

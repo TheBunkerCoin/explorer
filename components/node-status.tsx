@@ -23,7 +23,7 @@ export default function NodeStatus() {
   return (
     <section className="mb-10">
       <h2 className="text-xl font-bold mb-1 tracking-tight">Network Validators</h2>
-      <p className="text-sm text-muted-foreground mb-4">Currently online validators, determining the next block(s) - including the latest blockchain slot they're synced to.</p>
+      <p className="text-sm text-muted-foreground mb-4">Currently online validators, determining the next block(s) - including the latest blockchain slot they&apos;re synced to.</p>
       <div className="flex gap-3">
         {loading && !initialLoadComplete
           ? [...Array(4)].map((_, i) => (

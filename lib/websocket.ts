@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useSetAtom, useAtom } from 'jotai';
 import { blocksAtom, wsConnectedAtom, nonFinalizedSlotsAtom } from './atoms';
 import { Block } from './types';
@@ -8,11 +8,11 @@ const WS_URL = 'ws://localhost:3001/ws';
 export function useWebSocket() {
   const [blocks, setBlocks] = useAtom(blocksAtom);
   const setWsConnected = useSetAtom(wsConnectedAtom);
-  const [nonFinalizedSlots, setNonFinalizedSlots] = useAtom(nonFinalizedSlotsAtom);
+  const setNonFinalizedSlots = useSetAtom(nonFinalizedSlotsAtom);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const updateBlockStatus = (updatedBlock: Block) => {
+  const updateBlockStatus = useCallback((updatedBlock: Block) => {
     setBlocks(prevBlocks => {
       return prevBlocks.map(block => {
         if (block.slot === updatedBlock.slot) {
@@ -29,9 +29,9 @@ export function useWebSocket() {
         return newSet;
       });
     }
-  };
+  }, [setBlocks, setNonFinalizedSlots]);
 
-  const connect = () => {
+  const connect = useCallback(() => {
     try {
       const ws = new WebSocket(WS_URL);
       wsRef.current = ws;
@@ -79,7 +79,7 @@ export function useWebSocket() {
         connect();
       }, 3000);
     }
-  };
+  }, [setWsConnected, updateBlockStatus]);
 
   useEffect(() => {
     connect();
@@ -92,7 +92,7 @@ export function useWebSocket() {
         clearTimeout(reconnectTimeoutRef.current);
       }
     };
-  }, []);
+  }, [connect]);
 
   useEffect(() => {
     const nonFinalized = new Set<number>();

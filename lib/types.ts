@@ -2,7 +2,7 @@ export interface Block {
   type: 'block' | 'skip';
   slot: number;
   hash: string;
-  producer?: number; // only blocks
+  producer?: number; // Only for blocks, not skip certificates
   timestamp: number;
   parent_slot?: number;
   parent_hash?: string;
@@ -14,6 +14,5 @@ export interface Node {
   finalized_slot: number;
 }
 
-export interface BlockDetails extends Block {
-  // can include both blocks and skip certificates
-} 
+// BlockDetails is the same as Block for now, but kept separate for future extensions
+export type BlockDetails = Block; 
