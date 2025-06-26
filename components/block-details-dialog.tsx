@@ -56,6 +56,20 @@ export default function BlockDetailsDialog() {
     }
   }, [blockDetails]);
 
+  useEffect(() => {
+    if (selectedBlockHash === null) return;
+
+    const interval = setInterval(() => {
+      api.getBlock(selectedBlockHash)
+        .then((details) => {
+          setBlockDetails(details);
+        })
+        .catch(() => {});
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [selectedBlockHash, setBlockDetails]);
+
   const handleClose = () => {
     setSelectedBlockHash(null);
     setBlockDetails(null);
@@ -115,7 +129,7 @@ export default function BlockDetailsDialog() {
                 {copiedHash === blockDetails.hash ? (
                   <Check size={16} className="text-emerald-500" />
                 ) : (
-                  <Copy size={16} />
+                <Copy size={16} />
                 )}
               </button>
             </div>
@@ -211,7 +225,7 @@ export default function BlockDetailsDialog() {
                   {copiedHash === blockDetails.parent_hash ? (
                     <Check size={16} className="text-emerald-500" />
                   ) : (
-                    <Copy size={16} />
+                  <Copy size={16} />
                   )}
                 </button>
               </div>

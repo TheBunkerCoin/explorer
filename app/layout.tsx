@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     siteName: "BunkerCoin Explorer",
     images: [
       {
-        url: "/Preview.png",
+        url: "/preview.png",
         width: 1200,
         height: 630,
         alt: "BunkerCoin Explorer Preview",
