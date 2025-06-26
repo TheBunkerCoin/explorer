@@ -1,24 +1,33 @@
 'use client';
 
 import { useAtom } from 'jotai';
-import { nodesAtom, nodesLoadingAtom, latestProducerAtom, initialLoadCompleteAtom } from '@/lib/atoms';
+import { nodesAtom, nodesLoadingAtom, initialLoadCompleteAtom, recentlyFinalizedBlocksAtom } from '@/lib/atoms';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect, useState } from 'react';
 
 export default function NodeStatus() {
   const [nodes] = useAtom(nodesAtom);
   const [loading] = useAtom(nodesLoadingAtom);
-  const [latestProducer] = useAtom(latestProducerAtom);
   const [initialLoadComplete] = useAtom(initialLoadCompleteAtom);
-  const [flashingNode, setFlashingNode] = useState<number | null>(null);
+  const [recentlyFinalizedBlocks] = useAtom(recentlyFinalizedBlocksAtom);
+  const [flashingNodes, setFlashingNodes] = useState<Set<number>>(new Set());
 
   useEffect(() => {
-    if (latestProducer !== null) {
-      setFlashingNode(latestProducer);
-      const timeout = setTimeout(() => setFlashingNode(null), 1000);
+    const newFlashingNodes = new Set<number>();
+    recentlyFinalizedBlocks.forEach(block => {
+      newFlashingNodes.add(block.producer);
+    });
+    
+    if (newFlashingNodes.size > 0) {
+      setFlashingNodes(newFlashingNodes);
+      
+      const timeout = setTimeout(() => {
+        setFlashingNodes(new Set());
+      }, 1000);
+      
       return () => clearTimeout(timeout);
     }
-  }, [latestProducer]);
+  }, [recentlyFinalizedBlocks]);
 
   return (
     <section className="mb-10">
@@ -38,7 +47,7 @@ export default function NodeStatus() {
                 className={`relative rounded-lg bg-card/50 backdrop-blur px-4 py-3 flex-1
                   flex flex-col items-center transition-all duration-300
                   hover:bg-card/70 hover:scale-105
-                  ${flashingNode === node.node_id ? 'flash-highlight' : ''}`}
+                  ${flashingNodes.has(node.node_id) ? 'flash-highlight' : ''}`}
               >
                 <div className="flex items-center gap-2 mb-1">
                   <span className="relative flex h-2 w-2">

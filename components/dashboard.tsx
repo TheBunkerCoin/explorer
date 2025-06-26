@@ -14,11 +14,13 @@ import {
   latestProducerAtom,
   lowestFetchedSlotAtom,
   nonFinalizedSlotsAtom,
-  highestFinalizedSlotAtom
+  highestFinalizedSlotAtom,
+  recentlyFinalizedBlocksAtom
 } from '@/lib/atoms';
 import { api } from '@/lib/api';
 import { useWebSocket } from '@/lib/websocket';
 import NodeStatus from './node-status';
+import NetworkStats from './network-stats';
 import BlockList from './block-list';
 import BlockDetailsDialog from './block-details-dialog';
 
@@ -35,6 +37,7 @@ export default function Dashboard() {
   const setLowestFetchedSlot = useSetAtom(lowestFetchedSlotAtom);
   const [nonFinalizedSlots] = useAtom(nonFinalizedSlotsAtom);
   const setHighestFinalizedSlot = useSetAtom(highestFinalizedSlotAtom);
+  const setRecentlyFinalizedBlocks = useSetAtom(recentlyFinalizedBlocksAtom);
   
   const isFirstLoad = useRef(true);
   const totalBlocksCount = useRef(0);
@@ -59,7 +62,6 @@ export default function Dashboard() {
           if (newBlocks.length > 0) {
             setLowestFetchedSlot(newBlocks[newBlocks.length - 1].slot);
             
-            // Find highest finalized block on initial load
             const highestFinalized = newBlocks.find(block => 
               block.status === 'finalized' && 
               block.type === 'block' && 
@@ -79,6 +81,28 @@ export default function Dashboard() {
             newBlocks.forEach(newBlock => {
               const existingBlock = blockMap.get(newBlock.slot);
               
+              if (newBlock.status === 'finalized' && 
+                  newBlock.type === 'block' && 
+                  newBlock.producer !== undefined &&
+                  existingBlock && 
+                  existingBlock.status !== 'finalized') {
+                // This block just transitioned to finalized
+                setRecentlyFinalizedBlocks(prevFinalized => [
+                  ...prevFinalized,
+                  { 
+                    slot: newBlock.slot, 
+                    producer: newBlock.producer!, 
+                    timestamp: Date.now() 
+                  }
+                ]);
+                
+                setTimeout(() => {
+                  setRecentlyFinalizedBlocks(prevFinalized => 
+                    prevFinalized.filter(entry => Date.now() - entry.timestamp < 2000)
+                  );
+                }, 2000);
+              }
+              
               if (!existingBlock) {
                 blockMap.set(newBlock.slot, newBlock);
               } else if (existingBlock.status !== newBlock.status || 
@@ -89,7 +113,6 @@ export default function Dashboard() {
             
             const allBlocks = Array.from(blockMap.values()).sort((a, b) => b.slot - a.slot);
             
-            // Find the highest finalized block
             const highestFinalized = allBlocks.find(block => 
               block.status === 'finalized' && 
               block.type === 'block' && 
@@ -99,7 +122,6 @@ export default function Dashboard() {
             if (highestFinalized) {
               setHighestFinalizedSlot(prevHighest => {
                 if (prevHighest === null || highestFinalized.slot > prevHighest) {
-                  // New highest finalized block - highlight the producer
                   setLatestProducer(highestFinalized.producer!);
                   return highestFinalized.slot;
                 }
@@ -135,7 +157,7 @@ export default function Dashboard() {
       setIsLoadingMore(false);
       setInitialLoadComplete(true);
     }
-  }, [setBlocks, setBlocksLoading, setHasMoreBlocks, setCurrentOffset, setIsLoadingMore, setInitialLoadComplete, setLatestProducer, setLowestFetchedSlot]);
+  }, [setBlocks, setBlocksLoading, setHasMoreBlocks, setCurrentOffset, setIsLoadingMore, setInitialLoadComplete, setLatestProducer, setLowestFetchedSlot, setRecentlyFinalizedBlocks, setHighestFinalizedSlot]);
 
   const fetchNodes = useCallback(async () => {
     try {
@@ -180,6 +202,7 @@ export default function Dashboard() {
       <div className="w-full flex flex-col items-center px-4 sm:px-0 py-8">
         <div className="w-full max-w-3xl">
           <NodeStatus />
+          <NetworkStats />
           <BlockList />
         </div>
       </div>

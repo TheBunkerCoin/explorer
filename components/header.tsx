@@ -5,7 +5,7 @@ export default function Header() {
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
           BunkerCoin Explorer 
           <span className="block sm:inline">
-            <span className="text-lg font-normal ml-0 sm:ml-2">v0.0.1</span> 
+            <span className="text-lg font-normal ml-0 sm:ml-2">v0.0.2</span> 
             <span className="text-sm font-normal bg-emerald-500/20 text-emerald-500 px-1.5 py-1 rounded-md ml-2">Pre-Alpha</span>
           </span>
         </h1>

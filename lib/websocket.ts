@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useSetAtom, useAtom } from 'jotai';
-import { blocksAtom, wsConnectedAtom, nonFinalizedSlotsAtom, latestProducerAtom, highestFinalizedSlotAtom } from './atoms';
+import { blocksAtom, wsConnectedAtom, nonFinalizedSlotsAtom, latestProducerAtom, highestFinalizedSlotAtom, recentlyFinalizedBlocksAtom, radioStatsAtom } from './atoms';
 import { Block } from './types';
 
 const WS_URL = 'ws://localhost:3001/ws';
@@ -11,6 +11,8 @@ export function useWebSocket() {
   const setNonFinalizedSlots = useSetAtom(nonFinalizedSlotsAtom);
   const setLatestProducer = useSetAtom(latestProducerAtom);
   const setHighestFinalizedSlot = useSetAtom(highestFinalizedSlotAtom);
+  const setRecentlyFinalizedBlocks = useSetAtom(recentlyFinalizedBlocksAtom);
+  const setRadioStats = useSetAtom(radioStatsAtom);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -23,12 +25,28 @@ export function useWebSocket() {
         return block;
       });
 
-      // Check if this update creates a new highest finalized block
       if (updatedBlock.status === 'finalized' && 
           updatedBlock.type === 'block' && 
           updatedBlock.producer !== undefined) {
         
-        // Find the highest finalized block
+        const previousBlock = prevBlocks.find(b => b.slot === updatedBlock.slot);
+        if (previousBlock && previousBlock.status !== 'finalized') {
+          setRecentlyFinalizedBlocks(prev => [
+            ...prev,
+            { 
+              slot: updatedBlock.slot, 
+              producer: updatedBlock.producer!, 
+              timestamp: Date.now() 
+            }
+          ]);
+          
+          setTimeout(() => {
+            setRecentlyFinalizedBlocks(prev => 
+              prev.filter(entry => Date.now() - entry.timestamp < 2000)
+            );
+          }, 2000);
+        }
+
         const highestFinalized = newBlocks.find(block => 
           block.status === 'finalized' && 
           block.type === 'block' && 
@@ -38,7 +56,6 @@ export function useWebSocket() {
         if (highestFinalized && highestFinalized.slot === updatedBlock.slot) {
           setHighestFinalizedSlot(prevHighest => {
             if (prevHighest === null || updatedBlock.slot > prevHighest) {
-              // New highest finalized block - highlight the producer
               setLatestProducer(updatedBlock.producer!);
               return updatedBlock.slot;
             }
@@ -57,7 +74,7 @@ export function useWebSocket() {
         return newSet;
       });
     }
-  }, [setBlocks, setNonFinalizedSlots, setHighestFinalizedSlot, setLatestProducer]);
+  }, [setBlocks, setNonFinalizedSlots, setHighestFinalizedSlot, setLatestProducer, setRecentlyFinalizedBlocks]);
 
   const connect = useCallback(() => {
     try {
@@ -80,6 +97,16 @@ export function useWebSocket() {
           
           if (message.type === 'update_slot' && message.UpdateSlot) {
             updateBlockStatus(message.UpdateSlot);
+          } else if (message.type === 'radio_stats') {
+            setRadioStats({
+              packets_sent_2s: message.packets_sent_2s,
+              packets_dropped_2s: message.packets_dropped_2s,
+              packets_transmitted_2s: message.packets_transmitted_2s,
+              packets_queued: message.packets_queued,
+              bytes_transmitted_2s: message.bytes_transmitted_2s,
+              effective_throughput_bps_2s: message.effective_throughput_bps_2s,
+              packet_loss_rate_2s: message.packet_loss_rate_2s
+            });
           }
         } catch (error) {
           console.error('Failed to parse WebSocket message:', error);
@@ -107,7 +134,7 @@ export function useWebSocket() {
         connect();
       }, 3000);
     }
-  }, [setWsConnected, updateBlockStatus]);
+  }, [setWsConnected, updateBlockStatus, setRadioStats]);
 
   useEffect(() => {
     connect();

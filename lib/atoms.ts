@@ -29,4 +29,16 @@ export const highestFinalizedSlotAtom = atom<number | null>(null);
 
 export const wsConnectedAtom = atom(false);
 
-export const nonFinalizedSlotsAtom = atom<Set<number>>(new Set<number>()); 
+export const nonFinalizedSlotsAtom = atom<Set<number>>(new Set<number>());
+
+export const recentlyFinalizedBlocksAtom = atom<Array<{ slot: number; producer: number; timestamp: number }>>([]);
+
+export const radioStatsAtom = atom<{
+  packets_sent_2s: number;
+  packets_dropped_2s: number;
+  packets_transmitted_2s: number;
+  packets_queued: number;
+  bytes_transmitted_2s: number;
+  effective_throughput_bps_2s: number;
+  packet_loss_rate_2s: number;
+} | null>(null); 

@@ -12,14 +12,15 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import { Copy, AlertTriangle } from 'lucide-react';
+import { Copy, AlertTriangle, Clock } from 'lucide-react';
 
 export default function BlockDetailsDialog() {
   const [selectedBlockHash, setSelectedBlockHash] = useAtom(selectedBlockHashAtom);
   const [blockDetails, setBlockDetails] = useAtom(selectedBlockDetailsAtom);
   const [loading, setLoading] = useAtom(blockDetailsLoadingAtom);
+  const [pendingTime, setPendingTime] = useState(0);
 
   useEffect(() => {
     if (selectedBlockHash !== null) {
@@ -34,6 +35,22 @@ export default function BlockDetailsDialog() {
         });
     }
   }, [selectedBlockHash, setBlockDetails, setLoading]);
+
+  // Update pending time every second
+  useEffect(() => {
+    if (blockDetails && blockDetails.status !== 'finalized' && blockDetails.proposed_timestamp) {
+      const updatePendingTime = () => {
+        const now = Date.now();
+        const proposedTime = blockDetails.proposed_timestamp!;
+        setPendingTime(Math.floor((now - proposedTime) / 1000));
+      };
+
+      updatePendingTime();
+      const interval = setInterval(updatePendingTime, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [blockDetails]);
 
   const handleClose = () => {
     setSelectedBlockHash(null);
@@ -109,10 +126,39 @@ export default function BlockDetailsDialog() {
               </div>
             )}
 
-            <div className="flex items-center gap-2">
-              <span className="w-[110px] text-muted-foreground">Timestamp</span>
-              <span>{format(new Date(blockDetails.timestamp), 'PPpp')}</span>
-            </div>
+            {blockDetails.type === 'block' && (
+              <>
+                <div className="flex items-center gap-2">
+                  <span className="w-[110px] text-muted-foreground">Proposed at</span>
+                  <span>
+                    {blockDetails.proposed_timestamp
+                      ? format(new Date(blockDetails.proposed_timestamp), 'PPpp')
+                      : format(new Date(blockDetails.timestamp), 'PPpp')}
+                  </span>
+                </div>
+                {blockDetails.finalized_timestamp ? (
+                  <div className="flex items-center gap-2">
+                    <span className="w-[110px] text-muted-foreground">Finalized at</span>
+                    <span>{format(new Date(blockDetails.finalized_timestamp), 'PPpp')}</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="w-[110px] text-muted-foreground">Pending for</span>
+                    <span className="flex items-center gap-1.5">
+                      <Clock size={14} className="animate-pulse" />
+                      <span className="font-mono">{pendingTime}s</span>
+                    </span>
+                  </div>
+                )}
+              </>
+            )}
+
+            {blockDetails.type === 'skip' && (
+              <div className="flex items-center gap-2">
+                <span className="w-[110px] text-muted-foreground">Timestamp</span>
+                <span>{format(new Date(blockDetails.timestamp), 'PPpp')}</span>
+              </div>
+            )}
 
             {blockDetails.type === 'block' && blockDetails.parent_slot !== undefined && (
               <div className="flex items-center gap-2">

@@ -165,7 +165,13 @@ export default function BlockList() {
                           <span className="opacity-60">•</span>
                         </>
                       )}
-                      <span>{formatDistanceToNow(block.timestamp, { addSuffix: true })}</span>
+                      <span>
+                        {block.status === 'finalized' && block.finalized_timestamp
+                          ? formatDistanceToNow(block.finalized_timestamp, { addSuffix: true })
+                          : block.proposed_timestamp
+                            ? `Pending since ${formatDistanceToNow(block.proposed_timestamp, { addSuffix: true })}`
+                            : formatDistanceToNow(block.timestamp, { addSuffix: true })}
+                      </span>
                     </div>
                   </div>
                 </div>
