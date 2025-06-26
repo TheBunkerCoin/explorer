@@ -1,13 +1,14 @@
 'use client';
 
 import { useAtom, useSetAtom } from 'jotai';
-import { blocksAtom, blocksLoadingAtom, selectedBlockHashAtom, hasMoreBlocksAtom, isLoadingMoreAtom, initialLoadCompleteAtom, showSkippedSlotsAtom, displayCountAtom, highestFinalizedSlotAtom } from '@/lib/atoms';
+import { blocksAtom, blocksLoadingAtom, selectedBlockHashAtom, hasMoreBlocksAtom, isLoadingMoreAtom, initialLoadCompleteAtom, showSkippedSlotsAtom, displayCountAtom, highestFinalizedSlotAtom, selectedBlockDetailsAtom } from '@/lib/atoms';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { formatDistanceToNow } from 'date-fns';
 import { useEffect, useRef, useCallback } from 'react';
 import { Check, Loader2, AlertTriangle } from 'lucide-react';
+import { Block } from '@/lib/types';
 
 function truncateHash(hash: string) {
   return `${hash.slice(0, 6)}...${hash.slice(-4)}`;
@@ -56,12 +57,14 @@ export default function BlockList() {
   const [displayCount, setDisplayCount] = useAtom(displayCountAtom);
   const [highestFinalizedSlot] = useAtom(highestFinalizedSlotAtom);
   const setSelectedBlockHash = useSetAtom(selectedBlockHashAtom);
+  const setBlockDetails = useSetAtom(selectedBlockDetailsAtom);
   
   const observerTarget = useRef<HTMLDivElement>(null);
   const loadMoreTriggered = useRef(false);
 
-  const handleBlockClick = (hash: string) => {
-    setSelectedBlockHash(hash);
+  const handleBlockClick = (block: Block) => {
+    setSelectedBlockHash(block.hash);
+    setBlockDetails(block);
   };
 
   const filteredBlocks = showSkippedSlots 
@@ -136,7 +139,7 @@ export default function BlockList() {
             {displayBlocks.map((block) => (
               <div
                 key={block.hash}
-                onClick={() => handleBlockClick(block.hash)}
+                onClick={() => handleBlockClick(block)}
                 className={`group rounded-lg backdrop-blur px-4 py-3 flex items-center justify-between gap-4 hover:bg-card/70 transition-all duration-200 cursor-pointer mb-2 ${
                   block.type === 'skip' 
                     ? 'bg-red-900/10 border border-red-900/20' 
