@@ -68,7 +68,7 @@ export default function NetworkStats() {
           </div>
         </div>
 
-exü        <div className="rounded-lg bg-card/50 backdrop-blur p-4">
+        <div className="rounded-lg bg-card/50 backdrop-blur p-4">
           <h3 className="text-sm font-semibold mb-3 flex items-center gap-2 text-muted-foreground">
             <Activity size={16} className={radioStats ? 'text-emerald-400' : ''} />
             Live Radio Network Stats (Last 2 Seconds)
