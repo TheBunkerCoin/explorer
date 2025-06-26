@@ -13,7 +13,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect, useState } from 'react';
-import { format } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
 import { Copy, AlertTriangle, Clock, Check } from 'lucide-react';
 
 export default function BlockDetailsDialog() {
@@ -51,6 +51,8 @@ export default function BlockDetailsDialog() {
       const interval = setInterval(updatePendingTime, 1000);
 
       return () => clearInterval(interval);
+    } else {
+      setPendingTime(0);
     }
   }, [blockDetails]);
 
@@ -161,7 +163,11 @@ export default function BlockDetailsDialog() {
                     <span className="w-[110px] text-muted-foreground">Pending for</span>
                     <span className="flex items-center gap-1.5">
                       <Clock size={14} className="animate-pulse" />
-                      <span className="font-mono">{pendingTime}s</span>
+                      <span>
+                        {blockDetails.proposed_timestamp
+                          ? formatDistanceToNow(blockDetails.proposed_timestamp)
+                          : `${pendingTime}s`}
+                      </span>
                     </span>
                   </div>
                 )}
