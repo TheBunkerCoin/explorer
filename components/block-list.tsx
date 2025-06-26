@@ -1,7 +1,7 @@
 'use client';
 
 import { useAtom, useSetAtom } from 'jotai';
-import { blocksAtom, blocksLoadingAtom, selectedBlockHashAtom, hasMoreBlocksAtom, isLoadingMoreAtom, initialLoadCompleteAtom, showSkippedSlotsAtom, displayCountAtom, highestFinalizedSlotAtom, selectedBlockDetailsAtom } from '@/lib/atoms';
+import { blocksAtom, blocksLoadingAtom, selectedBlockHashAtom, hasMoreBlocksAtom, isLoadingMoreAtom, initialLoadCompleteAtom, showSkippedSlotsAtom, displayCountAtom, highestFinalizedSlotAtom } from '@/lib/atoms';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
@@ -57,14 +57,12 @@ export default function BlockList() {
   const [displayCount, setDisplayCount] = useAtom(displayCountAtom);
   const [highestFinalizedSlot] = useAtom(highestFinalizedSlotAtom);
   const setSelectedBlockHash = useSetAtom(selectedBlockHashAtom);
-  const setBlockDetails = useSetAtom(selectedBlockDetailsAtom);
   
   const observerTarget = useRef<HTMLDivElement>(null);
   const loadMoreTriggered = useRef(false);
 
   const handleBlockClick = (block: Block) => {
     setSelectedBlockHash(block.hash);
-    setBlockDetails(block);
   };
 
   const filteredBlocks = showSkippedSlots 

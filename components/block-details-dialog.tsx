@@ -26,6 +26,7 @@ export default function BlockDetailsDialog() {
   useEffect(() => {
     if (selectedBlockHash !== null) {
       setLoading(true);
+      setBlockDetails(null);
       api.getBlock(selectedBlockHash)
         .then((details) => {
           setBlockDetails(details);
@@ -33,6 +34,7 @@ export default function BlockDetailsDialog() {
         })
         .catch(() => {
           setLoading(false);
+          setBlockDetails(null);
         });
     }
   }, [selectedBlockHash, setBlockDetails, setLoading]);
