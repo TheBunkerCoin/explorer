@@ -3,7 +3,8 @@ import { useSetAtom, useAtom } from 'jotai';
 import { blocksAtom, wsConnectedAtom, nonFinalizedSlotsAtom, latestProducerAtom, highestFinalizedSlotAtom, recentlyFinalizedBlocksAtom, radioStatsAtom } from './atoms';
 import { Block } from './types';
 
-const WS_URL = 'ws://localhost:3001/ws';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const WS_URL = API_URL.replace(/^http/, 'ws') + '/ws';
 
 export function useWebSocket() {
   const [blocks, setBlocks] = useAtom(blocksAtom);
