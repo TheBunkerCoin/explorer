@@ -14,7 +14,9 @@ export const blocksAtom = atom(
     
     return Array.from(blockMap.values()).sort((a, b) => b.slot - a.slot);
   },
-  (get, set, newBlocks: Block[]) => {
+  (get, set, update: Block[] | ((prev: Block[]) => Block[])) => {
+    const currentBlocks = get(rawBlocksAtom);
+    const newBlocks = typeof update === 'function' ? update(currentBlocks) : update;
     set(rawBlocksAtom, newBlocks);
   }
 );
