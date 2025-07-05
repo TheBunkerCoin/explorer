@@ -136,7 +136,7 @@ export default function BlockList() {
           <>
             {displayBlocks.map((block) => (
               <div
-                key={block.hash}
+                key={block.slot}
                 onClick={() => handleBlockClick(block)}
                 className={`group rounded-lg backdrop-blur px-4 py-3 flex items-center justify-between gap-4 hover:bg-card/70 transition-all duration-200 cursor-pointer mb-2 ${
                   block.type === 'skip' 

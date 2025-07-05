@@ -1,7 +1,24 @@
 import { atom } from 'jotai';
 import { Block, Node, BlockDetails } from './types';
 
-export const blocksAtom = atom<Block[]>([]);
+const rawBlocksAtom = atom<Block[]>([]);
+
+export const blocksAtom = atom(
+  (get) => {
+    const blocks = get(rawBlocksAtom);
+    const blockMap = new Map<number, Block>();
+    
+    blocks.forEach(block => {
+      blockMap.set(block.slot, block);
+    });
+    
+    return Array.from(blockMap.values()).sort((a, b) => b.slot - a.slot);
+  },
+  (get, set, newBlocks: Block[]) => {
+    set(rawBlocksAtom, newBlocks);
+  }
+);
+
 export const nodesAtom = atom<Node[]>([]);
 
 export const blocksLoadingAtom = atom(true);
