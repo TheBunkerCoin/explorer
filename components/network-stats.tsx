@@ -3,8 +3,10 @@
 import { useAtom } from 'jotai';
 import { radioStatsAtom } from '@/lib/atoms';
 import { Skeleton } from '@/components/ui/skeleton';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Activity, Wifi } from 'lucide-react';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const NETWORK_CONFIG = {
   bandwidth_bps: 4800,
   packet_loss_percent: 15,
