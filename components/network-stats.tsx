@@ -42,8 +42,8 @@ export default function NetworkStats() {
         Radio network constraints and real-time performance metrics
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="rounded-lg bg-card/50 backdrop-blur p-4">
+      <div className="grid grid-cols-1 gap-4">
+        {/* <div className="rounded-lg bg-card/50 backdrop-blur p-4">
           <h3 className="text-sm font-semibold mb-3 flex items-center gap-2 text-muted-foreground">
             <Wifi size={16} />
             Network Configuration
@@ -66,7 +66,7 @@ export default function NetworkStats() {
               <span className="font-mono">{NETWORK_CONFIG.jitter_ms} ms</span>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className="rounded-lg bg-card/50 backdrop-blur p-4">
           <h3 className="text-sm font-semibold mb-3 flex items-center gap-2 text-muted-foreground">

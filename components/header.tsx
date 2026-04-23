@@ -10,7 +10,7 @@ export default function Header() {
           </span>
         </h1>
         <p className="text-sm text-muted-foreground mt-1 font-normal">
-          A minimal blockchain explorer for BunkerCoin - running Alpenglow on top of a simulated shortwave radio network.
+          A minimal blockchain explorer for BunkerCoin - running Alpenglow on top of a shortwave radio network.
         </p>
       </div>
     </header>
