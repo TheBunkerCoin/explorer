@@ -23,6 +23,7 @@ import NodeStatus from './node-status';
 import NetworkStats from './network-stats';
 import BlockList from './block-list';
 import BlockDetailsDialog from './block-details-dialog';
+import LivestreamPanel from './livestream-panel';
 
 export default function Dashboard() {
   const [blocks, setBlocks] = useAtom(blocksAtom);
@@ -203,6 +204,7 @@ export default function Dashboard() {
         <div className="w-full max-w-3xl">
           <NodeStatus />
           <NetworkStats />
+          <LivestreamPanel />
           <BlockList />
         </div>
       </div>
