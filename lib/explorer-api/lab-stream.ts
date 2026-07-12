@@ -1,4 +1,4 @@
-const EXPLORER_API_URL = process.env.NEXT_PUBLIC_EXPLORER_API_URL || 'http://localhost:8787';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787';
 
 export type LabStreamStatus = {
   labStreamSlug: string;
@@ -18,7 +18,7 @@ type LabStatusResponse = {
 };
 
 export async function requestLabStatus(): Promise<LabStreamStatus> {
-  const response = await fetch(`${EXPLORER_API_URL.replace(/\/$/, '')}/api/lab/status`, {
+  const response = await fetch(`${API_URL.replace(/\/$/, '')}/api/lab/status`, {
     cache: 'no-store',
   });
 
