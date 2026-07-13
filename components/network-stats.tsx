@@ -99,6 +99,10 @@ export default function NetworkStats() {
                 <span className="font-mono">{formatBytes(radioStats.bytes_transmitted_2s)}</span>
               </div>
               <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Bytes Received</span>
+                <span className="font-mono">{formatBytes(radioStats.bytes_received_2s)}</span>
+              </div>
+              <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Effective Throughput</span>
                 <span className="font-mono text-emerald-400">{formatBps(radioStats.effective_throughput_bps_2s)}</span>
               </div>

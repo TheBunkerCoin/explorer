@@ -107,7 +107,8 @@ export function useWebSocket() {
               bytes_transmitted_2s: message.bytes_transmitted_2s,
               effective_throughput_bps_2s: message.effective_throughput_bps_2s,
               packet_loss_rate_2s: message.packet_loss_rate_2s,
-              link_speed_level: message.link_speed_level ?? 0
+              link_speed_level: message.link_speed_level ?? 0,
+              bytes_received_2s: message.bytes_received_2s ?? 0
             });
           }
         } catch (error) {
