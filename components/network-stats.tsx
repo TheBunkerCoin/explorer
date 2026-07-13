@@ -107,12 +107,6 @@ export default function NetworkStats() {
                 <span className="font-mono text-emerald-400">{formatBps(radioStats.effective_throughput_bps_2s)}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Link Speed Level</span>
-                <span className="font-mono text-emerald-400">
-                  {radioStats.link_speed_level > 0 ? `SL ${radioStats.link_speed_level}` : '—'}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Packet Loss Rate (ARQ-corrected)</span>
                 <span className={`font-mono ${radioStats.packet_loss_rate_2s > 10 ? 'text-red-400' : ''}`}>
                   {radioStats.packet_loss_rate_2s.toFixed(1)}%
