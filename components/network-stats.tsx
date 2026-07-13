@@ -73,7 +73,7 @@ export default function NetworkStats() {
         <div className="rounded-lg bg-card/50 backdrop-blur p-4">
           <h3 className="text-sm font-semibold mb-3 flex items-center gap-2 text-muted-foreground">
             <Activity size={16} className={radioStats ? 'text-emerald-400' : ''} />
-            Live Radio Network Stats (Last 2 Seconds)
+            Live Radio Network Stats (Last 30 Seconds)
           </h3>
           {radioStats ? (
             <div className="space-y-2 text-sm">
@@ -103,7 +103,13 @@ export default function NetworkStats() {
                 <span className="font-mono text-emerald-400">{formatBps(radioStats.effective_throughput_bps_2s)}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Packet Loss Rate</span>
+                <span className="text-muted-foreground">Link Speed Level</span>
+                <span className="font-mono text-emerald-400">
+                  {radioStats.link_speed_level > 0 ? `SL ${radioStats.link_speed_level}` : '—'}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Packet Loss Rate (ARQ-corrected)</span>
                 <span className={`font-mono ${radioStats.packet_loss_rate_2s > 10 ? 'text-red-400' : ''}`}>
                   {radioStats.packet_loss_rate_2s.toFixed(1)}%
                 </span>

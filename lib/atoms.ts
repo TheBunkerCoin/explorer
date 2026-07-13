@@ -60,4 +60,5 @@ export const radioStatsAtom = atom<{
   bytes_transmitted_2s: number;
   effective_throughput_bps_2s: number;
   packet_loss_rate_2s: number;
+  link_speed_level: number;
 } | null>(null); 
