@@ -168,10 +168,13 @@ export const api = {
       if (tx) return { kind: 'transaction', id: q };
       if (block) return { kind: 'block', id: q };
       if (acct) return { kind: 'account', id: q };
-      // Nothing matched. A 64-hex value is most likely a tx signature the node
-      // hasn't indexed yet (pending / not finalized) — route there so the page
-      // can poll, rather than to a phantom account.
-      return { kind: 'transaction', id: q };
+      // Nothing matched. Route to the account page: a 32-byte value is
+      // addressable as an account for any key (the endpoint answers with a
+      // zeroed account when unseen), so this always renders something
+      // sensible — and the account page reads correctly whether or not the
+      // address has activity. A hex string is far more often a pasted
+      // address than an unindexed tx signature.
+      return { kind: 'account', id: q };
     }
 
     return { kind: 'unknown', id: q };
