@@ -22,6 +22,7 @@ import { useWebSocket } from '@/lib/websocket';
 import NodeStatus from './node-status';
 import NetworkStats from './network-stats';
 import BlockList from './block-list';
+import SearchBar from './search-bar';
 import BlockDetailsDialog from './block-details-dialog';
 import LivestreamPanel from './livestream-panel';
 
@@ -202,6 +203,9 @@ export default function Dashboard() {
     <>
       <div className="w-full flex flex-col items-center px-4 sm:px-0 py-8">
         <div className="w-full max-w-3xl">
+          <div className="mb-6">
+            <SearchBar />
+          </div>
           <NodeStatus />
           <NetworkStats />
           <LivestreamPanel />
