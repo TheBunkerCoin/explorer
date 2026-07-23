@@ -61,7 +61,10 @@ export default function SearchBar() {
           placeholder="Search by tx signature, address, block, or token"
           spellCheck={false}
           autoComplete="off"
-          className="w-full rounded-lg border border-border bg-card pl-9 pr-24 py-2.5 text-sm font-mono outline-none focus:border-emerald-500/60 transition-colors"
+          // text-base (16px) on mobile prevents iOS Safari from auto-zooming
+          // the viewport on focus; sm:text-sm restores the compact size on
+          // larger screens.
+          className="w-full rounded-lg border border-border bg-card pl-9 pr-24 py-2.5 text-base sm:text-sm font-mono outline-none focus:border-emerald-500/60 transition-colors"
         />
         <button
           type="submit"
