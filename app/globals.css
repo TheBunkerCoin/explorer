@@ -167,20 +167,24 @@
 @keyframes float-heart {
   0% {
     opacity: 0;
-    transform: translate(-50%, 0) scale(0.6);
+    transform: translate(-50%, 0) scale(0.5) rotate(0deg);
   }
-  15% {
+  12% {
     opacity: 1;
-    transform: translate(-50%, -12px) scale(1);
+    transform: translate(-50%, -16px) scale(1) rotate(-4deg);
+  }
+  55% {
+    opacity: 0.95;
+    transform: translate(calc(-50% - var(--drift, 0px) * 0.5), -90px) scale(1.05) rotate(5deg);
   }
   100% {
     opacity: 0;
-    transform: translate(calc(-50% + var(--drift, 0px)), -120px) scale(1.1);
+    transform: translate(calc(-50% + var(--drift, 0px)), -170px) scale(1.15) rotate(-3deg);
   }
 }
 
 .float-heart {
-  animation: float-heart 1.6s ease-out forwards;
+  animation: float-heart 1.8s ease-out forwards;
 }
 
 @keyframes like-pop {
