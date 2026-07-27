@@ -48,7 +48,8 @@ export default function StreamLikeButton() {
   }, []);
 
   return (
-    <div className="pointer-events-none absolute bottom-3 right-3 z-10 flex flex-col items-center">
+    // bottom-16 clears the player's control bar so fullscreen stays reachable.
+    <div className="pointer-events-none absolute bottom-16 right-3 z-10 flex flex-col items-center">
       {/* Floating hearts rise from just above the button. */}
       <div className="relative h-0 w-0">
         {hearts.map((h) => (
