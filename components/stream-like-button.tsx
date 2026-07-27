@@ -10,15 +10,16 @@ type FloatingHeart = {
   color: string;
   size: number;
   duration: number;
+  rise: number;
 };
 
 const HEART_COLORS = [
   'text-rose-500 fill-rose-500',
+  'text-rose-400 fill-rose-400',
   'text-pink-400 fill-pink-400',
+  'text-pink-500 fill-pink-500',
   'text-red-500 fill-red-500',
-  'text-orange-400 fill-orange-400',
-  'text-purple-400 fill-purple-400',
-  'text-fuchsia-500 fill-fuchsia-500',
+  'text-red-400 fill-red-400',
 ];
 
 export default function StreamLikeButton() {
@@ -30,10 +31,11 @@ export default function StreamLikeButton() {
     const id = heartSeq.current++;
     const heart: FloatingHeart = {
       id,
-      drift: Math.round((Math.random() - 0.5) * 72),
+      drift: Math.round((Math.random() - 0.5) * 90),
       color: HEART_COLORS[Math.floor(Math.random() * HEART_COLORS.length)],
-      size: 20 + Math.round(Math.random() * 12),
-      duration: 1.5 + Math.random() * 0.9,
+      size: 16 + Math.round(Math.random() * 20),
+      duration: 2.2 + Math.random(),
+      rise: -(260 + Math.round(Math.random() * 160)),
     };
     // Bound the live DOM against tap-spam.
     setHearts((prev) => [...prev.slice(-30), heart]);
@@ -52,9 +54,10 @@ export default function StreamLikeButton() {
         {hearts.map((h) => (
           <span
             key={h.id}
-            className="float-heart absolute bottom-10 left-1/2"
+            className="float-heart absolute -bottom-8 left-1/2"
             style={{
               ['--drift' as string]: `${h.drift}px`,
+              ['--rise' as string]: `${h.rise}px`,
               animationDuration: `${h.duration}s`,
             }}
             aria-hidden
@@ -69,7 +72,7 @@ export default function StreamLikeButton() {
         onClick={onLike}
         aria-label="Like the stream"
         className={cn(
-          'pointer-events-auto rounded-full border border-white/20 bg-black/50 p-2.5 text-white backdrop-blur transition-colors hover:bg-black/70',
+          'pointer-events-auto rounded-full bg-black/50 p-2.5 text-white backdrop-blur transition-colors hover:bg-black/70',
           popping && 'like-pop',
         )}
       >
