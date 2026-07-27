@@ -160,3 +160,54 @@
 .flash-highlight {
   animation: flash-highlight 1s ease-out;
 }
+
+/* Floating heart that drifts up and fades when a viewer likes the stream.
+   `--drift` randomizes horizontal wander per heart so a burst of taps spreads
+   out instead of stacking in one column. */
+@keyframes float-heart {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(0.5) rotate(0deg);
+  }
+  12% {
+    opacity: 1;
+    transform: translate(-50%, -16px) scale(1) rotate(-4deg);
+  }
+  55% {
+    opacity: 0.95;
+    transform: translate(calc(-50% - var(--drift, 0px) * 0.5), -90px) scale(1.05) rotate(5deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--drift, 0px)), -170px) scale(1.15) rotate(-3deg);
+  }
+}
+
+.float-heart {
+  animation: float-heart 1.8s ease-out forwards;
+}
+
+@keyframes like-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.like-pop {
+  animation: like-pop 0.35s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float-heart {
+    animation-duration: 0.8s;
+  }
+  .like-pop {
+    animation: none;
+  }
+}

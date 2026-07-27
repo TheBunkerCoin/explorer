@@ -29,3 +29,4 @@ export async function requestLabStatus(): Promise<LabStreamStatus> {
 
   return (payload as LabStatusResponse).data;
 }
+

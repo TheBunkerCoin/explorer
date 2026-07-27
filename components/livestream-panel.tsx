@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { requestLabStatus, type LabStreamStatus } from '@/lib/explorer-api/lab-stream';
+import StreamLikeButton from '@/components/stream-like-button';
 
 type StreamStatus = 'loading' | 'live' | 'waiting' | 'error';
 
@@ -89,6 +90,7 @@ export default function LivestreamPanel() {
         {shouldRenderPlayer && (
           <span className="sr-only">Live player loaded</span>
         )}
+        {shouldRenderPlayer && <StreamLikeButton />}
         {status !== 'live' && (
           <div className="absolute inset-0 grid place-items-center bg-black/70 px-6 text-center">
             <p className="text-sm text-muted-foreground">{message}</p>
