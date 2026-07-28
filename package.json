@@ -16,6 +16,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.19.1",
+    "hls.js": "^1.6.16",
     "jotai": "^2.12.5",
     "lucide-react": "^0.523.0",
     "next": "15.3.4",
