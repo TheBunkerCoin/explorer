@@ -78,7 +78,7 @@ export default function StreamLikeButton() {
         if (!Number.isFinite(likes) || likes < 1) return;
         const burst = Math.min(likes, MAX_REMOTE_HEARTS);
         for (let i = 0; i < burst; i++) {
-          remoteTimersRef.current.push(window.setTimeout(spawnHeart, Math.random() * 1200));
+          remoteTimersRef.current.push(window.setTimeout(spawnHeart, i === 0 ? 0 : Math.random() * 800));
         }
       };
       ws.onclose = () => {
@@ -86,15 +86,21 @@ export default function StreamLikeButton() {
         if (wsRef.current === ws) wsRef.current = null;
         if (!cancelled) {
           window.setTimeout(connect, retryMs);
-          retryMs = Math.min(retryMs * 2, 30_000);
+          retryMs = Math.min(retryMs * 2, 10_000);
         }
       };
     }
 
     connect();
+    // Keepalive: defeats NAT/idle timeouts so taps are never dropped on a zombie socket.
+    const ka = window.setInterval(() => {
+      const ws = wsRef.current;
+      if (ws?.readyState === WebSocket.OPEN) ws.send('{"ping":1}');
+    }, 25_000);
     const timers = remoteTimersRef.current;
     return () => {
       cancelled = true;
+      window.clearInterval(ka);
       wsRef.current?.close();
       if (flushTimerRef.current) clearTimeout(flushTimerRef.current);
       timers.forEach((t) => window.clearTimeout(t));
