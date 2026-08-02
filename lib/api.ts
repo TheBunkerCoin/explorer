@@ -49,6 +49,38 @@ function toHexId(id: string): string {
   return base58ToHex(id) ?? id;
 }
 
+// Accounts display as base58 (the wallet-facing address format); the node's
+// REST layer emits hex. Non-hex input is returned unchanged.
+export function hexToBase58(hex: string): string {
+  if (!/^[0-9a-fA-F]+$/.test(hex) || hex.length % 2 !== 0) return hex;
+  const bytes = hex.match(/../g)!.map((b) => parseInt(b, 16));
+  const digits: number[] = [0];
+  for (const byte of bytes) {
+    let carry = byte;
+    for (let i = 0; i < digits.length; i++) {
+      carry += digits[i] << 8;
+      digits[i] = carry % 58;
+      carry = (carry / 58) | 0;
+    }
+    while (carry > 0) {
+      digits.push(carry % 58);
+      carry = (carry / 58) | 0;
+    }
+  }
+  let prefix = '';
+  for (const byte of bytes) {
+    if (byte !== 0) break;
+    prefix += '1';
+  }
+  return (
+    prefix +
+    digits
+      .reverse()
+      .map((d) => B58_ALPHABET[d])
+      .join('')
+  );
+}
+
 export const api = {
   getBlocks: async (offset: number = 0, limit: number = 20): Promise<{ blocks: Block[], hasMore: boolean }> => {
     const response = await fetch(`${API_URL}/blocks?offset=${offset}&limit=${limit}`);
