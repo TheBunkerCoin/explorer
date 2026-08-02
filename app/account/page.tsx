@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react';
 import Header from '@/components/header';
 import { EntityPage, DetailRow, HashLink, NotFoundCard } from '@/components/explorer-ui';
 import { useQueryParam } from '@/lib/use-query-param';
-import { api } from '@/lib/api';
+import { api, hexToBase58 } from '@/lib/api';
 import { AccountDetails } from '@/lib/types';
 
 export default function AccountPage() {
@@ -47,7 +47,7 @@ export default function AccountPage() {
           <div className="space-y-5">
             <div className="rounded-lg border border-border/60 bg-card px-5">
               <DetailRow label="Address">
-                <HashLink value={account.pubkey ?? address} truncateTo={false} />
+                <HashLink value={hexToBase58(account.pubkey ?? address)} truncateTo={false} />
               </DetailRow>
               <DetailRow label="Balance">
                 <span className="text-lg font-semibold">

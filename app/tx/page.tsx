@@ -11,7 +11,7 @@ import {
   NotFoundCard,
 } from '@/components/explorer-ui';
 import { useQueryParam } from '@/lib/use-query-param';
-import { api } from '@/lib/api';
+import { api, hexToBase58 } from '@/lib/api';
 import { TransactionDetails } from '@/lib/types';
 
 function statusPill(status: TransactionDetails['status']) {
@@ -85,11 +85,11 @@ export default function TransactionPage() {
             ) : null}
             <DetailRow label="Type">{body?.type ?? (isTransfer ? 'Transfer' : 'Unknown')}</DetailRow>
             <DetailRow label="From">
-              <HashLink value={tx.sender} href={`/account?address=${tx.sender}`} />
+              <HashLink value={hexToBase58(tx.sender)} href={`/account?address=${tx.sender}`} />
             </DetailRow>
             {body?.to ? (
               <DetailRow label="To">
-                <HashLink value={body.to} href={`/account?address=${body.to}`} />
+                <HashLink value={hexToBase58(body.to)} href={`/account?address=${body.to}`} />
               </DetailRow>
             ) : null}
             {body?.amount !== undefined ? (

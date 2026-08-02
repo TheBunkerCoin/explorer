@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react';
 import Header from '@/components/header';
 import { EntityPage, DetailRow, HashLink, NotFoundCard } from '@/components/explorer-ui';
 import { useQueryParam } from '@/lib/use-query-param';
-import { api } from '@/lib/api';
+import { api, hexToBase58 } from '@/lib/api';
 import { TokenSummary, TokenHolder } from '@/lib/types';
 
 export default function TokenPage() {
@@ -66,7 +66,7 @@ export default function TokenPage() {
                 <div className="space-y-2">
                   {holders.map((h) => (
                     <div key={h.pubkey} className="flex items-center justify-between text-sm">
-                      <HashLink value={h.pubkey} href={`/account?address=${h.pubkey}`} />
+                      <HashLink value={hexToBase58(h.pubkey)} href={`/account?address=${h.pubkey}`} />
                       <span className="font-mono">{h.balance.toLocaleString()}</span>
                     </div>
                   ))}
