@@ -212,3 +212,7 @@ export const api = {
     return { kind: 'unknown', id: q };
   },
 }; 
+// Native amounts arrive in base units (1 BUNKER = 1,000,000 units).
+export function formatBunker(units: number): string {
+  return (units / 1_000_000).toLocaleString('en-US', { maximumFractionDigits: 6 });
+}

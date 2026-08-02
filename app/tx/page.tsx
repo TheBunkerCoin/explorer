@@ -11,7 +11,7 @@ import {
   NotFoundCard,
 } from '@/components/explorer-ui';
 import { useQueryParam } from '@/lib/use-query-param';
-import { api, hexToBase58 } from '@/lib/api';
+import { api, hexToBase58, formatBunker } from '@/lib/api';
 import { TransactionDetails } from '@/lib/types';
 
 function statusPill(status: TransactionDetails['status']) {
@@ -93,14 +93,16 @@ export default function TransactionPage() {
               </DetailRow>
             ) : null}
             {body?.amount !== undefined ? (
-              <DetailRow label="Amount">{body.amount.toLocaleString()} µBUNKER</DetailRow>
+              <DetailRow label="Amount">
+                {body.token_id ? `${body.amount.toLocaleString()} tokens` : `${formatBunker(body.amount)} BUNKER`}
+              </DetailRow>
             ) : null}
             {body?.token_id ? (
               <DetailRow label="Token">
                 <HashLink value={body.token_id} href={`/token?id=${body.token_id}`} truncateTo={false} />
               </DetailRow>
             ) : null}
-            <DetailRow label="Fee">{tx.fee.toLocaleString()} µBUNKER</DetailRow>
+            <DetailRow label="Fee">{formatBunker(tx.fee)} BUNKER</DetailRow>
             <DetailRow label="Nonce">{tx.nonce}</DetailRow>
           </div>
         )}
