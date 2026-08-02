@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react';
 import Header from '@/components/header';
 import { EntityPage, DetailRow, HashLink, NotFoundCard } from '@/components/explorer-ui';
 import { useQueryParam } from '@/lib/use-query-param';
-import { api, hexToBase58 } from '@/lib/api';
+import { api, hexToBase58, formatBunker } from '@/lib/api';
 import { AccountDetails } from '@/lib/types';
 
 export default function AccountPage() {
@@ -51,9 +51,9 @@ export default function AccountPage() {
               </DetailRow>
               <DetailRow label="Balance">
                 <span className="text-lg font-semibold">
-                  {account.native_balance.toLocaleString()}
+                  {formatBunker(account.native_balance)}
                 </span>{' '}
-                <span className="text-muted-foreground text-sm">µBUNKER</span>
+                <span className="text-muted-foreground text-sm">BUNKER</span>
               </DetailRow>
               <DetailRow label="Nonce">{account.nonce}</DetailRow>
             </div>
