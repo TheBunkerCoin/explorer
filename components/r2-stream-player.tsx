@@ -26,7 +26,10 @@ export default function R2StreamPlayer({ src }: { src: string }) {
     }
 
     const hls = new Hls({
-      liveSyncDurationCount: 3,
+      // Ride ~2 segments behind the live edge; drift back gets replayed at 1.1x.
+      liveSyncDurationCount: 2,
+      liveMaxLatencyDurationCount: 6,
+      maxLiveSyncPlaybackRate: 1.1,
       backBufferLength: 30,
     });
     hls.loadSource(src);
