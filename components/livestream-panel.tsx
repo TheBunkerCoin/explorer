@@ -1,15 +1,18 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { requestLabStatus, type LabStreamStatus } from '@/lib/explorer-api/lab-stream';
 import StreamLikeButton from '@/components/stream-like-button';
 import R2StreamPlayer from '@/components/r2-stream-player';
+import WhepPlayer from '@/components/whep-player';
 
 type StreamStatus = 'loading' | 'live' | 'waiting' | 'error';
 
 // When set (e.g. https://stream.bunkercoin.com/live/live.m3u8) the panel plays
 // R2-backed HLS directly instead of Cloudflare Stream.
 const R2_HLS_URL = process.env.NEXT_PUBLIC_STREAM_HLS_URL;
+// Sub-second WebRTC live view; unset or unreachable falls back to HLS.
+const WHEP_URL = process.env.NEXT_PUBLIC_WHEP_URL;
 
 const MANIFEST_POLL_MS = 5000;
 // Manifest unchanged for this long means the encoder stopped pushing.
@@ -23,9 +26,18 @@ export default function LivestreamPanel() {
 function R2Panel({ src }: { src: string }) {
   const [status, setStatus] = useState<StreamStatus>('loading');
   const [message, setMessage] = useState('Loading live view');
+  // WebRTC first for sub-second latency; any failure drops to HLS for good.
+  const [mode, setMode] = useState<'webrtc' | 'hls'>(WHEP_URL ? 'webrtc' : 'hls');
   const lastManifest = useRef<{ body: string; at: number }>({ body: '', at: 0 });
 
+  const whepLive = useCallback(() => {
+    setStatus('live');
+    setMessage('Live from the radio lab');
+  }, []);
+  const whepDown = useCallback(() => setMode('hls'), []);
+
   useEffect(() => {
+    if (mode !== 'hls') return;
     let cancelled = false;
 
     async function poll() {
@@ -59,11 +71,14 @@ function R2Panel({ src }: { src: string }) {
       cancelled = true;
       window.clearInterval(interval);
     };
-  }, [src]);
+  }, [src, mode]);
 
   return (
     <PanelChrome status={status} message={message}>
-      {status === 'live' && <R2StreamPlayer src={src} />}
+      {mode === 'webrtc' && WHEP_URL && (
+        <WhepPlayer src={WHEP_URL} onLive={whepLive} onDown={whepDown} />
+      )}
+      {mode === 'hls' && status === 'live' && <R2StreamPlayer src={src} />}
     </PanelChrome>
   );
 }
