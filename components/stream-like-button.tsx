@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 type FloatingHeart = {
   id: number;
   drift: number;
+  swayDuration: number;
   color: string;
   size: number;
   duration: number;
@@ -40,12 +41,14 @@ export default function StreamLikeButton() {
 
   const spawnHeart = useCallback(() => {
     const id = heartSeq.current++;
+    // Paced and shaped to match the lab overlay's hearts.
     const heart: FloatingHeart = {
       id,
-      drift: Math.round((Math.random() - 0.5) * 90),
+      drift: 8 + Math.round(Math.random() * 16),
+      swayDuration: 1.6 + Math.random() * 1.4,
       color: HEART_COLORS[Math.floor(Math.random() * HEART_COLORS.length)],
-      size: 16 + Math.round(Math.random() * 20),
-      duration: 2.2 + Math.random(),
+      size: 22 + Math.round(Math.random() * 26),
+      duration: 4 + Math.random() * 2.5,
       rise: -(260 + Math.round(Math.random() * 160)),
     };
     // Bound the live DOM against tap-spam plus remote bursts.
@@ -148,13 +151,23 @@ export default function StreamLikeButton() {
             key={h.id}
             className="float-heart absolute -bottom-8 left-1/2"
             style={{
-              ['--drift' as string]: `${h.drift}px`,
               ['--rise' as string]: `${h.rise}px`,
-              animationDuration: `${h.duration}s`,
+              ['--float-duration' as string]: `${h.duration}s`,
             }}
             aria-hidden
           >
-            <Heart style={{ width: h.size, height: h.size }} className={h.color} />
+            <span
+              className="float-heart-sway block"
+              style={{
+                ['--drift' as string]: `${h.drift}px`,
+                ['--sway-duration' as string]: `${h.swayDuration}s`,
+              }}
+            >
+              <Heart
+                style={{ width: h.size, height: h.size }}
+                className={cn(h.color, 'float-heart-pop')}
+              />
+            </span>
           </span>
         ))}
       </div>
