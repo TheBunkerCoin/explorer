@@ -26,15 +26,33 @@ export default function LivestreamPanel() {
 function R2Panel({ src }: { src: string }) {
   const [status, setStatus] = useState<StreamStatus>('loading');
   const [message, setMessage] = useState('Loading live view');
-  // WebRTC first for sub-second latency; any failure drops to HLS for good.
+  // WebRTC first for sub-second latency, HLS as a temporary stand-in: a blip
+  // (or the ingest's own restart) must not strand a long-lived tab on HLS.
   const [mode, setMode] = useState<'webrtc' | 'hls'>(WHEP_URL ? 'webrtc' : 'hls');
+  const [attempt, setAttempt] = useState(0);
   const lastManifest = useRef<{ body: string; at: number }>({ body: '', at: 0 });
+  const retryRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const whepLive = useCallback(() => {
     setStatus('live');
     setMessage('Live from the radio lab');
+    setAttempt(0); // a good connection earns a fast retry next time
   }, []);
-  const whepDown = useCallback(() => setMode('hls'), []);
+
+  const whepDown = useCallback(() => {
+    setMode('hls');
+    setAttempt((n) => n + 1);
+  }, []);
+
+  // Retry WebRTC on a backoff (10s → 2min) while HLS keeps the picture up.
+  useEffect(() => {
+    if (mode !== 'hls' || !WHEP_URL || attempt === 0) return;
+    const delay = Math.min(10_000 * 2 ** (attempt - 1), 120_000);
+    retryRef.current = setTimeout(() => setMode('webrtc'), delay);
+    return () => {
+      if (retryRef.current) clearTimeout(retryRef.current);
+    };
+  }, [mode, attempt]);
 
   useEffect(() => {
     if (mode !== 'hls') return;
@@ -76,7 +94,8 @@ function R2Panel({ src }: { src: string }) {
   return (
     <PanelChrome status={status} message={message}>
       {mode === 'webrtc' && WHEP_URL && (
-        <WhepPlayer src={WHEP_URL} onLive={whepLive} onDown={whepDown} />
+        // key forces a fresh peer connection on every retry.
+        <WhepPlayer key={attempt} src={WHEP_URL} onLive={whepLive} onDown={whepDown} />
       )}
       {mode === 'hls' && status === 'live' && <R2StreamPlayer src={src} />}
     </PanelChrome>
