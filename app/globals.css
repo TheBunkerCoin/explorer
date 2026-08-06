@@ -161,32 +161,51 @@
   animation: flash-highlight 1s ease-out;
 }
 
-/* Floating heart that drifts up and fades when a viewer likes the stream.
-   `--drift` randomizes horizontal wander per heart so a burst of taps spreads
-   out instead of stacking in one column. */
+/* Floating heart that rises and fades when a viewer likes the stream. Split
+   into rise + sway (like the lab overlay) so both screens read as one effect:
+   the wrapper carries the vertical travel, the inner span the wander. */
 @keyframes float-heart {
   0% {
-    opacity: 0;
-    transform: translate(-50%, 0) scale(0.6) rotate(0deg);
-  }
-  10% {
     opacity: 1;
-    transform: translate(-50%, -20px) scale(1.1) rotate(-5deg);
+    transform: translate(-50%, 0);
   }
-  50% {
-    opacity: 0.9;
-    transform: translate(calc(-50% - var(--drift, 0px) * 0.6), calc(var(--rise, -340px) * 0.5))
-      scale(0.85) rotate(6deg);
+  70% {
+    opacity: 1;
   }
   100% {
     opacity: 0;
-    transform: translate(calc(-50% + var(--drift, 0px)), var(--rise, -340px)) scale(0.5)
-      rotate(-4deg);
+    transform: translate(-50%, var(--rise, -340px));
+  }
+}
+
+@keyframes heart-sway {
+  from {
+    transform: translateX(calc(var(--drift, 40px) * -1));
+  }
+  to {
+    transform: translateX(var(--drift, 40px));
+  }
+}
+
+@keyframes heart-pop {
+  from {
+    transform: scale(0.2);
+  }
+  to {
+    transform: scale(1);
   }
 }
 
 .float-heart {
-  animation: float-heart 2.6s ease-out forwards;
+  animation: float-heart var(--float-duration, 3.4s) ease-in forwards;
+}
+
+.float-heart-sway {
+  animation: heart-sway var(--sway-duration, 1.4s) ease-in-out infinite alternate;
+}
+
+.float-heart-pop {
+  animation: heart-pop 0.45s cubic-bezier(0.2, 1.6, 0.4, 1) both;
 }
 
 @keyframes like-pop {
