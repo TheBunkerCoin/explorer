@@ -8,22 +8,22 @@ import WhepPlayer from '@/components/whep-player';
 
 type StreamStatus = 'loading' | 'live' | 'waiting' | 'error';
 
-// When set (e.g. https://stream.bunkercoin.com/live/live.m3u8) the panel plays
-// R2-backed HLS directly instead of Cloudflare Stream.
-const R2_HLS_URL = process.env.NEXT_PUBLIC_STREAM_HLS_URL;
-// Sub-second WebRTC live view; unset or unreachable falls back to HLS.
+// Sub-second WebRTC live view — the primary (and normally only) path.
 const WHEP_URL = process.env.NEXT_PUBLIC_WHEP_URL;
+// Optional HLS mirror. Unset in production: the box publishes only to WebRTC,
+// so a stale manifest would be worse than showing "reconnecting".
+const R2_HLS_URL = process.env.NEXT_PUBLIC_STREAM_HLS_URL;
 
 const MANIFEST_POLL_MS = 5000;
 // Manifest unchanged for this long means the encoder stopped pushing.
 const STALE_AFTER_MS = 20_000;
 
 export default function LivestreamPanel() {
-  if (R2_HLS_URL) return <R2Panel src={R2_HLS_URL} />;
+  if (WHEP_URL || R2_HLS_URL) return <R2Panel src={R2_HLS_URL} />;
   return <CloudflarePanel />;
 }
 
-function R2Panel({ src }: { src: string }) {
+function R2Panel({ src }: { src?: string }) {
   const [status, setStatus] = useState<StreamStatus>('loading');
   const [message, setMessage] = useState('Loading live view');
   // WebRTC first for sub-second latency, HLS as a temporary stand-in: a blip
@@ -40,9 +40,14 @@ function R2Panel({ src }: { src: string }) {
   }, []);
 
   const whepDown = useCallback(() => {
+    // Without an HLS mirror there is nothing to fall back to — say so and retry.
+    if (!src) {
+      setStatus('waiting');
+      setMessage('Reconnecting to the live view…');
+    }
     setMode('hls');
     setAttempt((n) => n + 1);
-  }, []);
+  }, [src]);
 
   // Retry WebRTC on a backoff (10s → 2min) while HLS keeps the picture up.
   useEffect(() => {
@@ -55,12 +60,13 @@ function R2Panel({ src }: { src: string }) {
   }, [mode, attempt]);
 
   useEffect(() => {
-    if (mode !== 'hls') return;
+    if (mode !== 'hls' || !src) return;
+    const manifestUrl = src;
     let cancelled = false;
 
     async function poll() {
       try {
-        const res = await fetch(src, { cache: 'no-store' });
+        const res = await fetch(manifestUrl, { cache: 'no-store' });
         if (!res.ok) throw new Error(`manifest ${res.status}`);
         const body = await res.text();
         if (cancelled) return;
@@ -97,7 +103,7 @@ function R2Panel({ src }: { src: string }) {
         // key forces a fresh peer connection on every retry.
         <WhepPlayer key={attempt} src={WHEP_URL} onLive={whepLive} onDown={whepDown} />
       )}
-      {mode === 'hls' && status === 'live' && <R2StreamPlayer src={src} />}
+      {mode === 'hls' && status === 'live' && src && <R2StreamPlayer src={src} />}
     </PanelChrome>
   );
 }
