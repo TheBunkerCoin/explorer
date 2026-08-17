@@ -112,8 +112,8 @@ export default function BlockList() {
           <h2 className="text-xl font-bold mb-1 tracking-tight">Recent Blocks</h2>
           <p className="text-sm text-muted-foreground">Latest blocks produced by the network. Click them to view details.</p>
         </div>
-        <div className="flex items-center gap-2">
-          <label htmlFor="show-skipped" className={`text-sm text-muted-foreground cursor-pointer transition-opacity ${!showSkippedSlots ? 'opacity-60' : 'opacity-100'}`}>
+        <div className="flex shrink-0 items-center gap-2 pl-4">
+          <label htmlFor="show-skipped" className={`text-sm text-muted-foreground cursor-pointer transition-opacity whitespace-nowrap ${!showSkippedSlots ? 'opacity-60' : 'opacity-100'}`}>
             Show skipped slots
           </label>
           <Switch
