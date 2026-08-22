@@ -126,7 +126,8 @@ export default function StreamLikeButton() {
   }, []);
 
   const onLike = useCallback(() => {
-    spawnHeart();
+    // No local heart: your like shows up in the video via the lab overlay
+    // (the hub excludes the sender from its broadcast).
     setPopping(true);
     window.setTimeout(() => setPopping(false), 350);
 
@@ -139,7 +140,7 @@ export default function StreamLikeButton() {
         flushTimerRef.current = setTimeout(flush, FLUSH_DEBOUNCE_MS);
       }
     }
-  }, [flush, spawnHeart]);
+  }, [flush]);
 
   return (
     // bottom-16 clears the player's control bar so fullscreen stays reachable.
