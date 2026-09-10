@@ -4,61 +4,18 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-type FloatingHeart = {
-  id: number;
-  drift: number;
-  swayDuration: number;
-  color: string;
-  size: number;
-  duration: number;
-  rise: number;
-};
-
-// Shared like fan-out; unset = hearts stay local to this viewer.
+// Likes fan out to the lab overlay only; the explorer never renders hearts.
 const LIKE_WS_URL = process.env.NEXT_PUBLIC_LIKE_WS_URL;
 const FLUSH_DEBOUNCE_MS = 400;
 const MAX_LIKES_PER_MESSAGE = 25;
-// Cap hearts per received broadcast so a burst stays a stream, not a wall.
-const MAX_REMOTE_HEARTS = 12;
-
-const HEART_COLORS = [
-  'text-rose-500 fill-rose-500',
-  'text-rose-400 fill-rose-400',
-  'text-pink-400 fill-pink-400',
-  'text-pink-500 fill-pink-500',
-  'text-red-500 fill-red-500',
-  'text-red-400 fill-red-400',
-];
 
 export default function StreamLikeButton() {
-  const [hearts, setHearts] = useState<FloatingHeart[]>([]);
   const [popping, setPopping] = useState(false);
-  const heartSeq = useRef(0);
   const wsRef = useRef<WebSocket | null>(null);
   const pendingRef = useRef(0);
   const flushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const remoteTimersRef = useRef<number[]>([]);
 
-  const spawnHeart = useCallback(() => {
-    const id = heartSeq.current++;
-    // Paced and shaped to match the lab overlay's hearts.
-    const heart: FloatingHeart = {
-      id,
-      drift: 8 + Math.round(Math.random() * 16),
-      swayDuration: 1.6 + Math.random() * 1.4,
-      color: HEART_COLORS[Math.floor(Math.random() * HEART_COLORS.length)],
-      size: 22 + Math.round(Math.random() * 26),
-      duration: 4 + Math.random() * 2.5,
-      rise: -(260 + Math.round(Math.random() * 160)),
-    };
-    // Bound the live DOM against tap-spam plus remote bursts.
-    setHearts((prev) => [...prev.slice(-30), heart]);
-    window.setTimeout(() => {
-      setHearts((prev) => prev.filter((h) => h.id !== id));
-    }, heart.duration * 1000 + 100);
-  }, []);
-
-  // Other viewers' likes rain down here too, live.
+  // Send-only socket: taps reach the lab overlay; nothing renders here.
   useEffect(() => {
     if (!LIKE_WS_URL) return;
     let cancelled = false;
@@ -70,19 +27,6 @@ export default function StreamLikeButton() {
       wsRef.current = ws;
       ws.onopen = () => {
         retryMs = 1000;
-      };
-      ws.onmessage = (e) => {
-        let likes: number;
-        try {
-          likes = Math.floor(Number((JSON.parse(String(e.data)) as { likes?: number }).likes));
-        } catch {
-          return;
-        }
-        if (!Number.isFinite(likes) || likes < 1) return;
-        const burst = Math.min(likes, MAX_REMOTE_HEARTS);
-        for (let i = 0; i < burst; i++) {
-          remoteTimersRef.current.push(window.setTimeout(spawnHeart, i === 0 ? 0 : Math.random() * 800));
-        }
       };
       ws.onclose = () => {
         // A stale close (strict-mode remount) must not clobber the live socket.
@@ -100,15 +44,13 @@ export default function StreamLikeButton() {
       const ws = wsRef.current;
       if (ws?.readyState === WebSocket.OPEN) ws.send('{"ping":1}');
     }, 25_000);
-    const timers = remoteTimersRef.current;
     return () => {
       cancelled = true;
       window.clearInterval(ka);
       wsRef.current?.close();
       if (flushTimerRef.current) clearTimeout(flushTimerRef.current);
-      timers.forEach((t) => window.clearTimeout(t));
     };
-  }, [spawnHeart]);
+  }, []);
 
   const flush = useCallback(() => {
     const ws = wsRef.current;
@@ -126,8 +68,7 @@ export default function StreamLikeButton() {
   }, []);
 
   const onLike = useCallback(() => {
-    // No local heart: your like shows up in the video via the lab overlay
-    // (the hub excludes the sender from its broadcast).
+    // Button pops locally; the heart itself only appears on the lab overlay.
     setPopping(true);
     window.setTimeout(() => setPopping(false), 350);
 
@@ -145,34 +86,6 @@ export default function StreamLikeButton() {
   return (
     // bottom-16 clears the player's control bar so fullscreen stays reachable.
     <div className="pointer-events-none absolute bottom-16 right-3 z-10 flex flex-col items-center">
-      {/* Floating hearts rise from just above the button. */}
-      <div className="relative h-0 w-0">
-        {hearts.map((h) => (
-          <span
-            key={h.id}
-            className="float-heart absolute -bottom-8 left-1/2"
-            style={{
-              ['--rise' as string]: `${h.rise}px`,
-              ['--float-duration' as string]: `${h.duration}s`,
-            }}
-            aria-hidden
-          >
-            <span
-              className="float-heart-sway block"
-              style={{
-                ['--drift' as string]: `${h.drift}px`,
-                ['--sway-duration' as string]: `${h.swayDuration}s`,
-              }}
-            >
-              <Heart
-                style={{ width: h.size, height: h.size }}
-                className={cn(h.color, 'float-heart-pop')}
-              />
-            </span>
-          </span>
-        ))}
-      </div>
-
       <button
         type="button"
         onClick={onLike}

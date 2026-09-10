@@ -161,53 +161,6 @@
   animation: flash-highlight 1s ease-out;
 }
 
-/* Floating heart that rises and fades when a viewer likes the stream. Split
-   into rise + sway (like the lab overlay) so both screens read as one effect:
-   the wrapper carries the vertical travel, the inner span the wander. */
-@keyframes float-heart {
-  0% {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-  70% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, var(--rise, -340px));
-  }
-}
-
-@keyframes heart-sway {
-  from {
-    transform: translateX(calc(var(--drift, 40px) * -1));
-  }
-  to {
-    transform: translateX(var(--drift, 40px));
-  }
-}
-
-@keyframes heart-pop {
-  from {
-    transform: scale(0.2);
-  }
-  to {
-    transform: scale(1);
-  }
-}
-
-.float-heart {
-  animation: float-heart var(--float-duration, 3.4s) ease-in forwards;
-}
-
-.float-heart-sway {
-  animation: heart-sway var(--sway-duration, 1.4s) ease-in-out infinite alternate;
-}
-
-.float-heart-pop {
-  animation: heart-pop 0.45s cubic-bezier(0.2, 1.6, 0.4, 1) both;
-}
-
 @keyframes like-pop {
   0% {
     transform: scale(1);
@@ -225,9 +178,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .float-heart {
-    animation-duration: 0.8s;
-  }
   .like-pop {
     animation: none;
   }
