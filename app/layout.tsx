@@ -13,9 +13,20 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const title = "BunkerCoin Explorer | Private Testnet";
+const description =
+  "Explore the BunkerCoin Private Testnet and watch the livestream. Running Alpenglow consensus on a shortwave radio network.";
+const socialImage = {
+  url: "/explorer-og.png",
+  width: 1200,
+  height: 630,
+  type: "image/png",
+  alt: "BunkerCoin Explorer Private Testnet with shortwave radio equipment",
+};
+
 export const metadata: Metadata = {
-  title: "BunkerCoin Explorer",
-  description: "A minimal blockchain explorer for BunkerCoin - running Alpenglow consensus on a simulated shortwave radio network",
+  title,
+  description,
   
   // Favicon
   icons: {
@@ -26,24 +37,11 @@ export const metadata: Metadata = {
   
   // Open Graph metadata
   openGraph: {
-    title: "BunkerCoin Explorer",
-    description: "A minimal blockchain explorer for BunkerCoin - running Alpenglow consensus on a simulated shortwave radio network",
-    url: "https://explorer.bunkercoin.io",
+    title,
+    description,
+    url: "https://explorer.bunkercoin.com/",
     siteName: "BunkerCoin Explorer",
-    images: [
-      {
-        url: "/preview.png",
-        width: 1200,
-        height: 630,
-        alt: "BunkerCoin Explorer Preview",
-      },
-      {
-        url: "/preview-square.png",
-        width: 1200,
-        height: 1200,
-        alt: "BunkerCoin Explorer Preview Square",
-      },
-    ],
+    images: [socialImage],
     locale: "en_US",
     type: "website",
   },
@@ -51,14 +49,14 @@ export const metadata: Metadata = {
   // Twitter Card metadata
   twitter: {
     card: "summary_large_image",
-    title: "BunkerCoin Explorer",
-    description: "A minimal blockchain explorer for BunkerCoin - running Alpenglow consensus on a simulated shortwave radio network",
-    images: ["/preview.png"],
+    title,
+    description,
+    images: [socialImage],
     creator: "@bunkercoin_io",
   },
   
   // Additional metadata
-  metadataBase: new URL("https://explorer.bunkercoin.io"),
+  metadataBase: new URL("https://explorer.bunkercoin.com"),
   alternates: {
     canonical: "/",
   },
