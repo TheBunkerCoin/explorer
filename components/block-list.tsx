@@ -167,6 +167,9 @@ export default function BlockList() {
                         </>
                       )}
                       <span>
+                        {block.type === 'block' && block.status === 'finalized' && block.finalized_timestamp
+                          ? `Finalized ${formatDistanceToNow(block.finalized_timestamp, { addSuffix: true })}, `
+                          : ''}
                         {block.type === 'block' && block.proposed_timestamp ? 'Proposed ' : ''}
                         {formatDistanceToNow(
                           block.proposed_timestamp || block.timestamp,
