@@ -167,16 +167,11 @@ export default function BlockList() {
                         </>
                       )}
                       <span>
-                        {/* Decided rows may lack a finalize time (ancestry-finalized
-                            blocks, skip certs) — never label those "Pending". */}
-                        {block.status === 'finalized'
-                          ? formatDistanceToNow(
-                              block.finalized_timestamp || block.proposed_timestamp || block.timestamp,
-                              { addSuffix: true },
-                            )
-                          : block.proposed_timestamp
-                            ? `Pending since ${formatDistanceToNow(block.proposed_timestamp, { addSuffix: true })}`
-                            : formatDistanceToNow(block.timestamp, { addSuffix: true })}
+                        {block.type === 'block' && block.proposed_timestamp ? 'Proposed ' : ''}
+                        {formatDistanceToNow(
+                          block.proposed_timestamp || block.timestamp,
+                          { addSuffix: true },
+                        )}
                       </span>
                     </div>
                   </div>
@@ -226,4 +221,4 @@ export default function BlockList() {
       `}</style>
     </section>
   );
-} 
+}
