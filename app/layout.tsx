@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "BunkerCoin Explorer",
-  description: "A minimal blockchain explorer for BunkerCoin - running Alpenglow consensus on a simulated shortwave radio network",
+  description: "A minimal blockchain explorer for BunkerCoin - running Alpenglow consensus on a shortwave radio network",
   
   // Favicon
   icons: {
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   // Open Graph metadata
   openGraph: {
     title: "BunkerCoin Explorer",
-    description: "A minimal blockchain explorer for BunkerCoin - running Alpenglow consensus on a simulated shortwave radio network",
+    description: "A minimal blockchain explorer for BunkerCoin - running Alpenglow consensus on a shortwave radio network",
     url: "https://explorer.bunkercoin.io",
     siteName: "BunkerCoin Explorer",
     images: [
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "BunkerCoin Explorer",
-    description: "A minimal blockchain explorer for BunkerCoin - running Alpenglow consensus on a simulated shortwave radio network",
+    description: "A minimal blockchain explorer for BunkerCoin - running Alpenglow consensus on a shortwave radio network",
     images: ["/preview.png"],
     creator: "@bunkercoin_io",
   },
